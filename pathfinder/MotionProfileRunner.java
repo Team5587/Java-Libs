@@ -1,44 +1,44 @@
-package org.frc5587.lib.pathfinder;
+// package org.frc5587.lib.pathfinder;
 
-import com.ctre.phoenix.motion.SetValueMotionProfile;
+// import com.ctre.phoenix.motion.SetValueMotionProfile;
 
-import edu.wpi.first.wpilibj.command.Command;
+// import edu.wpi.first.wpilibj.command.Command;
 
-public class MotionProfileRunner extends Command {
-    AbstractDrive drive;
-    boolean ready = false;
+// public class MotionProfileRunner extends Command {
+//     AbstractDrive drive;
+//     boolean ready = false;
 
-    public MotionProfileRunner(AbstractDrive drivetrain) {
-        this.drive = drivetrain;
-        requires(drivetrain);
-    }
+//     public MotionProfileRunner(AbstractDrive drivetrain) {
+//         this.drive = drivetrain;
+//         requires(drivetrain);
+//     }
 
-    public void initialize() {
-        drive.setProfileMode(SetValueMotionProfile.Disable);
-        drive.enableBrakeMode(true);
-    }
+//     public void initialize() {
+//         drive.setProfileMode(SetValueMotionProfile.Disable);
+//         drive.enableBrakeMode(true);
+//     }
 
-    public void execute() {
-        if (!ready) {
-            ready = drive.isMPReady();
-        } else {
-            drive.setProfileMode(SetValueMotionProfile.Enable);
-        }
-        drive.sendDebugInfo();
-        drive.sendMPDebugInfo();
-    }
+//     public void execute() {
+//         if (!ready) {
+//             ready = drive.isMPReady();
+//         } else {
+//             drive.setProfileMode(SetValueMotionProfile.Enable);
+//         }
+//         drive.sendDebugInfo();
+//         drive.sendMPDebugInfo();
+//     }
 
-    public boolean isFinished() {
-        return drive.isMPDone();
-    }
+//     public boolean isFinished() {
+//         return drive.isMPDone();
+//     }
 
-    public void end() {
-        drive.resetMP();
-        drive.stop();
-        drive.enableBrakeMode(false);
-    }
+//     public void end() {
+//         drive.resetMP();
+//         drive.stop();
+//         drive.enableBrakeMode(false);
+//     }
 
-    public void interrupted() {
-        end();
-    }
-}
+//     public void interrupted() {
+//         end();
+//     }
+// }
