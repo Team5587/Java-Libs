@@ -87,8 +87,6 @@ public abstract class SparkAbstractDrive extends Subsystem {
             double wheelDiameterMeters, int minBufferCount) {
         // this.maxVelocity = maxVelocity;
         this.timeoutMS = timeoutMS;
-        // this.stuPerRev = stuPerRev;
-        // this.stuPerInch = stuPerInch;
         this.wheelDiameterMeters = wheelDiameterMeters;
         this.minBufferCount = minBufferCount;
     }
