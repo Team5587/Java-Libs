@@ -3,6 +3,7 @@ package org.frc5587.lib.pathfinder;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANAnalog;
 import com.revrobotics.CANEncoder;
+// import com.revrobotics.CANError;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -16,8 +17,8 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public abstract class SparkAbstractDrive extends Subsystem {
-    protected CANSparkMax leftLeader, rightLeader;
-    protected CANSparkMax leftFollower, rightFollower;
+    protected CANSparkMax leftOne, rightOne;
+    protected CANSparkMax leftTwo, rightTwo;
     protected CANPIDController spark_pidControllerLeft, spark_pidControllerRight;
     protected CANEncoder leftSparkEncoder, rightSparkEncoder;
     protected CANAnalog leftSparkAnalog, rightSparkAnalog;
@@ -27,7 +28,7 @@ public abstract class SparkAbstractDrive extends Subsystem {
     int minBufferCount;
 
     // convert to whatever unit sparks are in
-    private double maxVelocity = 2500; // Max velocity in STU (max value is 4096)
+    // private double maxVelocity = 2500; // Max velocity in STU (max value is 4096)
     private int timeoutMS = 10;
     // public int stuPerRev, stuPerInch, minBufferCount;
     public double wheelDiameterMeters;
@@ -35,18 +36,18 @@ public abstract class SparkAbstractDrive extends Subsystem {
     // private MotionProfileStatus[] statuses = { new MotionProfileStatus(), new MotionProfileStatus() };
     public Notifier profileNotifer = new Notifier(new ProcessProfileRunnable());
 
-    public SparkAbstractDrive(CANSparkMax leftLeader, CANSparkMax rightLeader, CANSparkMax leftFollower,
+    public SparkAbstractDrive(CANSparkMax leftOne, CANSparkMax rightLeader, CANSparkMax leftFollower,
             CANSparkMax rightFollower, boolean flipRight) {
         // Set motors to correct objects and connect the masters and slaves
-        this.leftLeader = leftLeader;
-        this.leftFollower = leftFollower;
-        this.rightLeader = rightLeader;
-        this.rightFollower = rightFollower;
-        leftFollower.follow(leftLeader);
+        this.leftOne = leftOne;
+        this.leftTwo = leftFollower;
+        this.rightOne = rightLeader;
+        this.rightTwo = rightFollower;
+        leftFollower.follow(leftOne);
         rightFollower.follow(rightLeader);
 
         // Left should not be reversed
-        leftLeader.setInverted(false);
+        leftOne.setInverted(false);
         leftFollower.setInverted(false);
 
         // Invert the right side of the drivetrain
@@ -63,10 +64,13 @@ public abstract class SparkAbstractDrive extends Subsystem {
         // this.leftLeader.setSensorPhase(true);
         // this.rightMaster.setSensorPhase(true);
 
+        leftSparkEncoder = leftOne.getEncoder();
+        rightSparkEncoder = rightOne.getEncoder();
+
         this.ahrs = null;
         this.gyro = null;
 
-        configPID(0);
+        // configPID(0);
         configSettings();
         enableBrakeMode(true);
     }
@@ -81,7 +85,7 @@ public abstract class SparkAbstractDrive extends Subsystem {
 
     public void setConstants(double maxVelocity, int timeoutMS, /*int stuPerRev, int stuPerInch,*/
             double wheelDiameterMeters, int minBufferCount) {
-        this.maxVelocity = maxVelocity;
+        // this.maxVelocity = maxVelocity;
         this.timeoutMS = timeoutMS;
         // this.stuPerRev = stuPerRev;
         // this.stuPerInch = stuPerInch;
@@ -95,15 +99,15 @@ public abstract class SparkAbstractDrive extends Subsystem {
 
     public void enableBrakeMode(boolean enabled) {
         if (enabled) {
-            leftLeader.setIdleMode(IdleMode.kBrake);
-            rightLeader.setIdleMode(IdleMode.kBrake);
-            leftFollower.setIdleMode(IdleMode.kBrake);
-            rightFollower.setIdleMode(IdleMode.kBrake);
+            leftOne.setIdleMode(IdleMode.kBrake);
+            rightOne.setIdleMode(IdleMode.kBrake);
+            leftTwo.setIdleMode(IdleMode.kBrake);
+            rightTwo.setIdleMode(IdleMode.kBrake);
         } else {
-            leftLeader.setIdleMode(IdleMode.kCoast);
-            rightLeader.setIdleMode(IdleMode.kCoast);
-            leftFollower.setIdleMode(IdleMode.kCoast);
-            rightFollower.setIdleMode(IdleMode.kCoast);
+            leftOne.setIdleMode(IdleMode.kCoast);
+            rightOne.setIdleMode(IdleMode.kCoast);
+            leftTwo.setIdleMode(IdleMode.kCoast);
+            rightTwo.setIdleMode(IdleMode.kCoast);
         }
     }
 
@@ -112,24 +116,26 @@ public abstract class SparkAbstractDrive extends Subsystem {
     public void vbusCurve(double throttle, double curve, boolean isQuickTurn) {
         DriveSignal d = TitanDrive.curvatureDrive(throttle, curve, isQuickTurn);
 
-        leftLeader.set(d.left);
-        rightLeader.set(d.right);
+        leftOne.set(d.left);
+        rightOne.set(d.right);
     }
 
     public void vbusArcade(double throttle, double turn) {
         DriveSignal d = TitanDrive.arcadeDrive(throttle, turn);
 
-        leftLeader.set(d.left);
-        rightLeader.set(d.right);
+        leftOne.set(d.left);
+        rightOne.set(d.right);
+        leftTwo.set(d.left);
+        rightTwo.set(d.right);
     }
 
     public void vbusLR(double left, double right) {
-        leftLeader.set(left);
-        rightLeader.set(right);
+        leftOne.set(left);
+        rightOne.set(right);
     }
 
     public void velocityCurve(double throttle, double curve, boolean isQuickTurn) {
-        DriveSignal d = TitanDrive.curvatureDrive(throttle, curve, isQuickTurn);
+        // DriveSignal d = TitanDrive.curvatureDrive(throttle, curve, isQuickTurn);
 
         // convert velocity to percent output?
         // leftMaster.set(ControlMode.Velocity, d.left * maxVelocity);
@@ -137,15 +143,17 @@ public abstract class SparkAbstractDrive extends Subsystem {
     }
 
     public void velocityArcade(double throttle, double turn) {
-        DriveSignal d = TitanDrive.arcadeDrive(throttle, turn);
+        // DriveSignal d = TitanDrive.arcadeDrive(throttle, turn);
 
         // leftMaster.set(ControlMode.Velocity, d.left * maxVelocity);
         // rightMaster.set(ControlMode.Velocity, d.right * maxVelocity);
     }
 
     public void stop() {
-        leftLeader.disable();
-        rightLeader.disable();
+        leftOne.disable();
+        rightOne.disable();
+        leftTwo.disable();
+        rightTwo.disable();
     }
 
     /* --- MOTION PROFILE HANDLING CODE --- */
