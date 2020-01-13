@@ -1,9 +1,9 @@
 package org.frc5587.lib.command;
 
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ParallelCommand extends Command {
-    Command[] commands;
+public class ParallelCommand extends CommandBase {
+    CommandBase[] commands;
 
     /**
      * This is a class used to run two or more commands simultaneously in a more
@@ -12,29 +12,29 @@ public class ParallelCommand extends Command {
      * the often confusing addParallel method in CommandGroups, one can simply use
      * this class in place of any normal command.
      */
-    public ParallelCommand(Command... commands) {
+    public ParallelCommand(CommandBase... commands) {
         this.commands = commands;
     }
 
-    // Called just before this Command runs the first time
+    // Called just before this CommandBase runs the first time
     @Override
-    protected void initialize() {
-        for (Command command : commands) {
-            command.start();
+    public void initialize() {
+        for (CommandBase command : commands) {
+            command.initialize();
         }
     }
 
-    // Called repeatedly when this Command is scheduled to run
+    // Called repeatedly when this CommandBase is scheduled to run
     @Override
-    protected void execute() {
+    public void execute() {
     }
 
-    // Make this return true when this Command no longer needs to run execute()
+    // Make this return true when this CommandBase no longer needs to run execute()
     @Override
-    protected boolean isFinished() {
+    public boolean isFinished() {
         // Check if any commands are not complete and return false if they aren't
-        for (Command command : commands) {
-            if (!command.isCompleted()) {
+        for (CommandBase command : commands) {
+            if (!command.isFinished()) {
                 return false;
             }
         }
@@ -44,15 +44,11 @@ public class ParallelCommand extends Command {
 
     // Called once after isFinished returns true
     @Override
-    protected void end() {
-    }
-
-    // Called when another command which requires one or more of the same
-    // subsystems is scheduled to run
-    @Override
-    protected void interrupted() {
-        for (Command command : commands) {
-            command.cancel();
+    public void end(boolean interrupted) {
+        if (interrupted){
+            for (CommandBase command : commands) {
+                command.cancel();
+            }
         }
     }
 }

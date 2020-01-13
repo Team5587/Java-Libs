@@ -13,10 +13,10 @@ import org.frc5587.lib.TitanDrive.DriveSignal;
 
 import edu.wpi.first.wpilibj.GyroBase;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public abstract class SparkAbstractDrive extends Subsystem {
+public abstract class SparkAbstractDrive extends SubsystemBase {
     protected CANSparkMax leftOne, rightOne;
     protected CANSparkMax leftTwo, rightTwo;
     protected CANPIDController spark_pidControllerLeft, spark_pidControllerRight;
